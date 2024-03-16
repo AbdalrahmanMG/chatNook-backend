@@ -60,6 +60,7 @@ const login = async (req, res) => {
   }
 };
 
+// logout function
 const logout = (req, res) => {
   try {
     res.cookie('jwt',"", {

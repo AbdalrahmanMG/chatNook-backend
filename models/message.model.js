@@ -18,4 +18,11 @@ let messageSchema = new mongoose.Schema({
   }
 }, {timestamps: true});
 
+messageSchema.virtual('id').get(function (){
+  return this._id.toHexString()
+})
+messageSchema.set('toJSON',{
+  virtuals:true
+})
+
 module.exports = mongoose.model("Message", messageSchema);

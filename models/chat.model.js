@@ -18,4 +18,11 @@ let chatSchema = new mongoose.Schema({
   ],
 }, {timestamps: true});
 
+chatSchema.virtual('id').get(function (){
+  return this._id.toHexString()
+})
+chatSchema.set('toJSON',{
+  virtuals:true
+})
+
 module.exports = mongoose.model("Chat", chatSchema);

@@ -1,6 +1,61 @@
-const sendMessage =async (req, res)=>{
-    console.log('iam sending message...');
-    res.send('i am sending now..')
-}
+const Chat = require("../models/chat.model.js");
+const Massage = require("../models/message.model.js");
 
-module.exports = {sendMessage}
+const sendMessage = async (req, res) => {
+  try {
+    const { message } = req.body;
+    const { id: recieverId } = req.params;
+    const senderId = req.user.id;
+
+    // console.log("message", message, "reciever", recieverId, "sender", senderId );
+
+    let chat = await Chat.findOne({
+      participants: { $all: [senderId, recieverId] },
+    });
+
+    if (!chat) {
+      chat = await Chat.create({
+        participants: [senderId, recieverId],
+      });
+    }
+
+    const newMessage = new Massage({
+      senderId,
+      recieverId,
+      message,
+    });
+
+    if (newMessage) {
+      chat.messages.push(newMessage._id);
+    }
+
+    await chat.save();
+    await newMessage.save();
+
+    res.status(201).json(newMessage);
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+const getMessage = async (req, res) => {
+  try {
+    const { id: recieverId } = req.params;
+    const senderId = req.user.id;
+
+    const chat = await Chat.findOne({
+      participants: { $all: [senderId, recieverId] },
+    }).populate("messages");
+
+    if (!chat) {
+      return res.status(200).json([]);
+    }
+
+    res.status(200).json(chat.messages);
+    
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+module.exports = { sendMessage, getMessage };

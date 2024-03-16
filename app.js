@@ -6,6 +6,7 @@ const cookieParser  = require('cookie-parser')
 // file imports
 const userRoutes = require("./routes/user.routes.js");
 const messageRoutes = require("./routes/message.routes.js");
+const contactsRoutes = require("./routes/contacts.routes.js");
 const connectToDb = require("./db/connectToDB.js");
 
 // variables
@@ -21,6 +22,7 @@ app.use(cookieParser())
 //routes
 app.use("/user", userRoutes);
 app.use("/message", messageRoutes);
+app.use("/contacts", contactsRoutes);
 
 app.listen(port, () => {
   connectToDb();
