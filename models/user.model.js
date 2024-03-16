@@ -18,11 +18,6 @@ const userSchema = new mongoose.Schema({
         type:String,
         required: true
     },
-    // phone:{
-    //     type:Number,
-    //     required:true,
-    //     unique:true
-    // },
     profilePic:{
         type: String,
         default: '../assets/download.png'

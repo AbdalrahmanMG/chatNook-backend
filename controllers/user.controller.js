@@ -19,7 +19,6 @@ const signup = async (req, res) => {
       fullName,
       password: passwordHashed,
       email,
-      // phone,
     });
 
     if (!newUser) {
