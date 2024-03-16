@@ -12,14 +12,14 @@ const signup = async (req, res) => {
       });
     }
 
-    const { fullName, phone, email, password } = req.body;
+    const { fullName, email, password } = req.body;
     const passwordHashed = await bcryptjs.hash(password, 10);
 
     const newUser = await User({
       fullName,
       password: passwordHashed,
       email,
-      phone,
+      // phone,
     });
 
     if (!newUser) {
@@ -33,7 +33,7 @@ const signup = async (req, res) => {
 
     return res
       .status(201)
-      .json({ success: true, message: "", newuser: newUser });
+      .json( newUser );
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });
   }
