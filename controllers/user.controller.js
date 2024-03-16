@@ -27,6 +27,7 @@ const signup = async (req, res) => {
         message: "failed to create User!",
       });
     }
+    
     generateToken(newUser.id, res);
     await newUser.save();
 
@@ -34,7 +35,7 @@ const signup = async (req, res) => {
       .status(201)
       .json( newUser );
   } catch (error) {
-    return res.status(500).json({ success: false, message: error.message });
+    return res.status(500).json({ success: false, error: error.message, message: "server error!" });
   }
 };
 

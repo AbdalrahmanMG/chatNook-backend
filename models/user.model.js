@@ -20,7 +20,7 @@ const userSchema = new mongoose.Schema({
     },
     profilePic:{
         type: String,
-        default: '../assets/download.png'
+        default: 'https://i.ibb.co/xhbZ5fQ/download.png'
     },
 },{timestamps: true})
 
@@ -50,7 +50,7 @@ const userValidationSchema = yup.object().shape({
             "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character"
         ),
     profilePic: yup.string()
-        .default('../assets/download.png')
+        .default('https://i.ibb.co/xhbZ5fQ/download.png')
 });
 
 const validateUser = async (userData) =>{
