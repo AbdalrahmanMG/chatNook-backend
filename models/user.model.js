@@ -24,11 +24,7 @@ const userSchema = new mongoose.Schema({
         type: String,
         default: ''
     },
-    createdAt: {
-        type: Date,
-        default: Date.now,
-      },
-})
+},{timestamps: true})
 
 userSchema.virtual('id').get(function (){
     return this._id.toHexString()
