@@ -32,7 +32,7 @@ const sendMessage = async (req, res) => {
     await chat.save();
     await newMessage.save();
 
-    res.status(201).json(newMessage);
+    res.status(200).json(newMessage);
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });
   }

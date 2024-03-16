@@ -8,9 +8,10 @@ const signup = async (req, res) => {
     const validationResult = await validateUser(req.body);
     if (!validationResult) {
       return res.status(400).json({
-        errors: validationResult.errors,
+        message: "Validation Error",
       });
     }
+    console.log(validationResult);
 
     const { fullName, email, password } = req.body;
     const passwordHashed = await bcryptjs.hash(password, 10);
@@ -21,13 +22,14 @@ const signup = async (req, res) => {
       email,
     });
 
+    console.log(newUser);
     if (!newUser) {
-      return res.status(400).json({
+      return res.status(401).json({
         success: false,
         message: "failed to create User!",
       });
     }
-    
+
     generateToken(newUser.id, res);
     await newUser.save();
 

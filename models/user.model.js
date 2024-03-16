@@ -16,7 +16,8 @@ const userSchema = new mongoose.Schema({
     },
     password:{
         type:String,
-        required: true
+        required: true,
+        match: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!#%*?&])[A-Za-z\d@$!#%*?&]{8,}$/,
     },
     profilePic:{
         type: String,
