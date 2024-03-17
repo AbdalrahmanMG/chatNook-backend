@@ -76,4 +76,24 @@ const logout = (req, res) => {
   }
 };
 
-module.exports = { login, logout, signup };
+const changepic = async (req, res)=>{
+  try {
+    const loggedUserId = req.user.id;
+    const profilePic = req.body.profilePic
+
+    const updatedUser = await User.findByIdAndUpdate(loggedUserId,
+      {
+        profilePic 
+      },{new: true})
+
+      if (!updatedUser) {
+        return res.status(400).json({ message: "user is not found" });
+      }
+      return res.status(200).json(updatedUser)
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+
+  }
+}
+
+module.exports = { login, logout, signup , changepic};

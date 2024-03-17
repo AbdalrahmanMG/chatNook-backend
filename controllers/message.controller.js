@@ -26,7 +26,7 @@ const sendMessage = async (req, res) => {
     });
 
     if (newMessage) {
-      chat.messages.push(newMessage._id);
+      chat.messages.push(newMessage.id);
     }
 
     await chat.save();
