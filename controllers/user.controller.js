@@ -45,7 +45,7 @@ const signup = async (req, res) => {
 const login = async (req, res) => {
   try {
     let { email, password } = req.body;
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email })
     const isPasswordCorrect = await bcryptjs.compare(
       password,
       user?.password || ""
@@ -84,7 +84,7 @@ const changepic = async (req, res)=>{
     const updatedUser = await User.findByIdAndUpdate(loggedUserId,
       {
         profilePic 
-      },{new: true})
+      },{new: true}).select("-password")
 
       if (!updatedUser) {
         return res.status(400).json({ message: "user is not found" });
