@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const yup = require("yup");
 
 let chatSchema = new mongoose.Schema({
   participants: [
@@ -16,6 +15,14 @@ let chatSchema = new mongoose.Schema({
       default: [],
     },
   ],
+  chatName:{
+    type: String,
+    default: ''  // defalut should be the reciever name 
+  },
+  isGroup:{
+    type: Boolean,
+    default: false
+  }
 }, {timestamps: true});
 
 chatSchema.virtual('id').get(function (){

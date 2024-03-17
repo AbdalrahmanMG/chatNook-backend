@@ -1,27 +1,29 @@
 const Chat = require("../models/chat.model.js");
 const Massage = require("../models/message.model.js");
 
+// sending messages and creating chat
 const sendMessage = async (req, res) => {
   try {
-    const { message } = req.body;
-    const { id: recieverId } = req.params;
+    const { recieverId, message, chatId } = req.body;
     const senderId = req.user.id;
-
-    // console.log("message", message, "reciever", recieverId, "sender", senderId );
-
+    console.log("recieverid", recieverId, "message", message, "chatid", chatId);
+   
     let chat = await Chat.findOne({
-      participants: { $all: [senderId, recieverId] },
-    });
+      _id: chatId,
+    }).populate("messages");
 
+    console.log('chat', chat);
     if (!chat) {
       chat = await Chat.create({
         participants: [senderId, recieverId],
       });
     }
+    console.log('chat', chat);
+
 
     const newMessage = new Massage({
       senderId,
-      recieverId,
+      chatId: chatId ? chatId : chat.id,
       message,
     });
 
@@ -38,24 +40,49 @@ const sendMessage = async (req, res) => {
   }
 };
 
-const getMessage = async (req, res) => {
+// show messages
+const getChatMessages = async (req, res) => {
   try {
-    const { id: recieverId } = req.params;
-    const senderId = req.user.id;
+    const { id: chatId } = req.params;
+    console.log("chatid", chatId);
 
     const chat = await Chat.findOne({
-      participants: { $all: [senderId, recieverId] },
+      _id: chatId,
     }).populate("messages");
 
+    console.log(chat);
     if (!chat) {
       return res.status(200).json([]);
     }
 
-    res.status(200).json(chat.messages);
-    
+    res.status(200).json(chat);
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });
   }
 };
 
-module.exports = { sendMessage, getMessage };
+// show messages
+const createChat = async (req, res) => {
+  try {
+    const senderId = req.user.id;
+    const { isGroup, recieversIds, chatName } = req.body;
+    let chat;
+
+    if (!isGroup) {
+      return res.status(200).json([]);
+    } else {
+      chat = await Chat.create({
+        chatName,
+        participants: [senderId, ...recieversIds],
+        isGroup,
+      });
+    }
+
+    await chat.save();
+    res.status(200).json(chat);
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+module.exports = { sendMessage, getChatMessages, createChat };

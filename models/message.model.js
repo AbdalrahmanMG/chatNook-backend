@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const yup = require("yup");
 
 let messageSchema = new mongoose.Schema({
   senderId: {
@@ -7,9 +6,9 @@ let messageSchema = new mongoose.Schema({
     ref: "User",
     required: true,
   },
-  recieverId: {
+  chatId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
+    ref: "Chat",
     required: true,
   },
   message:{

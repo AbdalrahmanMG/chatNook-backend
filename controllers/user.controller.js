@@ -76,6 +76,7 @@ const logout = (req, res) => {
   }
 };
 
+// changing profile picture
 const changepic = async (req, res)=>{
   try {
     const loggedUserId = req.user.id;
