@@ -8,9 +8,10 @@ const userRoutes = require("./routes/user.routes.js");
 const messageRoutes = require("./routes/message.routes.js");
 const contactsRoutes = require("./routes/contacts.routes.js");
 const connectToDb = require("./db/connectToDB.js");
+const {app, httpServer} = require('./websocket/socket.js')
 
 // variables
-const app = express();
+// const app = express();
 const port = process.env.PORT;
 
 dotenv.config();
@@ -24,7 +25,7 @@ app.use("/user", userRoutes);
 app.use("/message", messageRoutes);
 app.use("/contacts", contactsRoutes);
 
-app.listen(port, () => {
+httpServer.listen(port, () => {
   connectToDb();
   console.log(`Server is running on port ${port}`);
 });

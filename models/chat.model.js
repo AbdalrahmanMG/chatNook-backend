@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const yup = require("yup");
 
 let chatSchema = new mongoose.Schema({
   participants: [

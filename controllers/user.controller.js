@@ -22,7 +22,7 @@ const signup = async (req, res) => {
         error: "Email already exists"
       });
     }
-    
+
     const passwordHashed = await bcryptjs.hash(password, 10);
 
     const newUser = await User({
@@ -42,6 +42,12 @@ const signup = async (req, res) => {
     generateToken(newUser._id, res);
 
     return res.status(201).json(newUser);
+    // return res.status(201).json({
+    //   id:newUser._id,
+    //   fullName: newUser.fullName,
+    //   email: newUser.email,
+    //   profilePic: newUser.profilePic
+    // });
   } catch (error) {
     return res
       .status(500)
@@ -64,6 +70,7 @@ const login = async (req, res) => {
     }
 
     generateToken(user.id, res);
+    
     return res.status(200).json(user);
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });

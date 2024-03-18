@@ -32,12 +32,19 @@ const sendMessage = async (req, res) => {
     await chat.save();
     await newMessage.save();
 
+    // Socket io
+    const recieverIdSocket = getRecieverIdSocket(recieverId)
+    if (recieverIdSocket) {
+      io.to(recieverIdSocket).emit("newMessage", newMessage)
+    }
+
     res.status(200).json(newMessage);
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });
   }
 };
 
+// show chat messages
 const getMessage = async (req, res) => {
   try {
     const { id: recieverId } = req.params;
