@@ -18,12 +18,14 @@ const sendMessage = async (req, res) => {
         participants: [senderId, recieverId],
       });
     }
+    console.log("chat", chat);
 
     const newMessage = new Massage({
       senderId,
       recieverId,
       message,
     });
+    console.log("newMessage", newMessage);
 
     if (newMessage) {
       chat.messages.push(newMessage.id);
@@ -33,10 +35,10 @@ const sendMessage = async (req, res) => {
     await newMessage.save();
 
     // Socket io
-    const recieverIdSocket = getRecieverIdSocket(recieverId)
-    if (recieverIdSocket) {
-      io.to(recieverIdSocket).emit("newMessage", newMessage)
-    }
+    // const recieverIdSocket = getRecieverIdSocket(recieverId)
+    // if (recieverIdSocket) {
+    //   io.to(recieverIdSocket).emit("newMessage", newMessage)
+    // }
 
     res.status(200).json(newMessage);
   } catch (error) {
@@ -65,4 +67,5 @@ const getMessage = async (req, res) => {
   }
 };
 
-module.exports = { sendMessage, getMessage };
+
+module.exports = { sendMessage, getMessage};

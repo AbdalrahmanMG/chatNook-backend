@@ -71,7 +71,14 @@ const login = async (req, res) => {
 
     generateToken(user.id, res);
     
-    return res.status(200).json(user);
+    return res.status(200).json({
+      id:user.id,
+      fullName:user.fullName,
+      email:user.email,
+      profilePic:user.profilePic,
+      createdAt:user.createdAt,
+      updatedAt: user.updatedAt
+    });
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });
   }
