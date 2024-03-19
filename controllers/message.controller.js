@@ -1,31 +1,31 @@
 const Chat = require("../models/chat.model.js");
 const Massage = require("../models/message.model.js");
+const { User } = require("../models/user.model.js");
 
 const sendMessage = async (req, res) => {
   try {
-    const { message } = req.body;
-    const { id: recieverId } = req.params;
-    const senderId = req.user.id;
+    const { message, chatId, recieverId } = req.body;
+    const LoggedUser = req.user.id;
 
-    // console.log("message", message, "reciever", recieverId, "sender", senderId );
-
-    let chat = await Chat.findOne({
-      participants: { $all: [senderId, recieverId] },
-    });
+    const chat = await Chat.findOne({ _id: chatId });
+    console.log("chat before check", chat);
 
     if (!chat) {
+      let reciever = await User.findById(recieverId);
       chat = await Chat.create({
-        participants: [senderId, recieverId],
+        participants: [LoggedUser, recieverId],
+        chatName: reciever.fullName,
       });
     }
 
+    console.log("chat after check", chat);
+
     const newMessage = new Massage({
-      senderId,
+      senderId: LoggedUser,
       recieverId,
       message,
-      chatId: chat._id
+      chatId: chat._id,
     });
-    console.log("newMessage", newMessage);
 
     if (newMessage) {
       chat.messages.push(newMessage.id);
@@ -46,26 +46,98 @@ const sendMessage = async (req, res) => {
   }
 };
 
-// show chat messages
 const getMessage = async (req, res) => {
   try {
-    const { id: recieverId } = req.params;
-    const senderId = req.user.id;
+    const { chatId } = req.body;
+    const LoggedUser = req.user.id;
 
-    const chat = await Chat.findOne({
-      participants: { $all: [senderId, recieverId] },
-    }).populate("messages");
+    const chat = await Chat.findOne({ _id: chatId }).populate("messages");
+    console.log(chat);
 
     if (!chat) {
       return res.status(200).json([]);
     }
 
+    const userInChat = chat.participants.find(
+      (participant) => participant == LoggedUser
+    );
+
+    if (!userInChat) {
+      return res
+        .status(403)
+        .json({ error: "You are not authorized to access this chat" });
+    }
+
     res.status(200).json(chat.messages);
-    
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });
   }
 };
 
+// // show chat messages
+// const getMessage = async (req, res) => {
+//   try {
+//     const { id: recieverId } = req.params;
+//     const senderId = req.user.id;
 
-module.exports = { sendMessage, getMessage};
+//     const chat = await Chat.findOne({
+//       participants: { $all: [senderId, recieverId] },
+//     }).populate("messages");
+
+//     if (!chat) {
+//       return res.status(200).json([]);
+//     }
+
+//     res.status(200).json(chat.messages);
+
+//   } catch (error) {
+//     return res.status(500).json({ success: false, message: error.message });
+//   }
+// };
+// const sendMessage = async (req, res) => {
+//   try {
+//     const { message, chatId , recieverId } = req.body;
+//     // const { id: recieverId, } = req.params;
+//     const senderId = req.user.id;
+
+//     // console.log("message", message, "reciever", recieverId, "sender", senderId );
+
+//     let chat = await Chat.findOne({
+//       participants: { $all: [senderId, recieverId] },
+//     });
+
+//     if (!chat) {
+//       let reciever = await User.findById(recieverId);
+//       chat = await Chat.create({
+//         participants: [senderId, recieverId],
+//         chatName: reciever.fullName,
+//       });
+//     }
+
+//     const newMessage = new Massage({
+//       senderId,
+//       recieverId,
+//       message,
+//       chatId: chat._id,
+//     });
+
+//     if (newMessage) {
+//       chat.messages.push(newMessage.id);
+//     }
+
+//     await chat.save();
+//     await newMessage.save();
+
+//     // Socket io
+//     // const recieverIdSocket = getRecieverIdSocket(recieverId)
+//     // if (recieverIdSocket) {
+//     //   io.to(recieverIdSocket).emit("newMessage", newMessage)
+//     // }
+
+//     res.status(200).json(newMessage);
+//   } catch (error) {
+//     return res.status(500).json({ success: false, message: error.message });
+//   }
+// };
+
+module.exports = { sendMessage, getMessage };

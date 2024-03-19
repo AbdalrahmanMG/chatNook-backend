@@ -41,7 +41,10 @@ const signup = async (req, res) => {
     await newUser.save();
     generateToken(newUser._id, res);
 
-    return res.status(201).json(newUser);
+    return res.status(201).json({
+      success: true,
+      message: "User is Created!"
+    });
     // return res.status(201).json({
     //   id:newUser._id,
     //   fullName: newUser.fullName,
@@ -76,8 +79,8 @@ const login = async (req, res) => {
       fullName:user.fullName,
       email:user.email,
       profilePic:user.profilePic,
-      createdAt:user.createdAt,
-      updatedAt: user.updatedAt
+      // createdAt:user.createdAt,
+      // updatedAt: user.updatedAt
     });
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });

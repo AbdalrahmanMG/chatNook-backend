@@ -2,6 +2,7 @@ const { User } = require("../models/user.model");
 const Chat = require("../models/chat.model.js");
 const Message = require("../models/message.model.js");
 
+// get all contacts except me 
 const getContactsSideBar = async (req, res) => {
   try {
     const loggedUserId = req.user.id;
@@ -11,7 +12,13 @@ const getContactsSideBar = async (req, res) => {
       },
     }).select("-password");
 
-    return res.status(200).json(allContacts);
+    let modifiedContacts = allContacts.map(c=>({
+      id: c._id,
+      fullName: c.fullName,
+      profilePic: c.profilePic,
+    }))
+
+    return res.status(200).json(modifiedContacts);
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });
   }
@@ -21,10 +28,6 @@ const getContactsSideBar = async (req, res) => {
 const getChats = async (req, res) => {
   const loggedUserId = req.user.id;
   try {
-    // let chats = await Chat.find({
-    //   participants: { $in: [loggedUserId] },
-    // }).populate('participants').populate('messages')
-
     let chats = await Chat.find({ participants: loggedUserId }).populate(
       "participants",
       "-password"
@@ -43,8 +46,9 @@ const getChats = async (req, res) => {
       _id: chat._id,
       participants: chat.participants,
       lastMessage: chat.lastMessage,
+      chatName: chat.chatName,
       createdAt: chat.createdAt,
-      updatedAt: chat.updatedAt,
+      updatedAt: chat.updatedAt
     }));
 
     return res.status(200).json(formattedChats);
@@ -53,4 +57,25 @@ const getChats = async (req, res) => {
   }
 };
 
-module.exports = { getContactsSideBar, getChats };
+// create chat 
+const createGroupChat = async (req, res)=>{
+try {
+  const loggedUserId = req.user.id;
+  const {participants, chatName} = req.body
+
+  let chat = await Chat.create({
+    participants: [loggedUserId, ...participants],
+    chatName
+  })
+
+  chat = await Chat.findById(chat._id).populate('participants');
+
+
+  return res.status(200).json({success: true, chat})
+} catch (error) {
+  return res.status(500).json({ success: false, message: error.message });
+}
+
+
+}
+module.exports = { getContactsSideBar, getChats , createGroupChat};
