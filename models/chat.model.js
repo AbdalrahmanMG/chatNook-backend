@@ -5,6 +5,10 @@ let chatSchema = new mongoose.Schema(
     chatName: {
       type: String,
     },
+    chatPic:{
+      type: String,
+      default: 'https://i.ibb.co/HXGbzTJ/icons-5235125-1280.webp'
+    },
     participants: [
       {
         type: mongoose.Schema.Types.ObjectId,

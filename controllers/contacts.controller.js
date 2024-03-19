@@ -32,9 +32,11 @@ const getChats = async (req, res) => {
       "participants",
       "-password"
     );
+
     if (!chats) {
       return res.status(400).json({success: false, message:"No chats found"})
     }
+
     for (let chat of chats) {
       let lastMessage = await Message.findOne({ chatId: chat._id }).sort({
         createdAt: -1,
@@ -44,11 +46,12 @@ const getChats = async (req, res) => {
 
     const formattedChats = chats.map((chat) => ({
       _id: chat._id,
+      chatPic: chat.chatPic,
       participants: chat.participants,
       lastMessage: chat.lastMessage,
       chatName: chat.chatName,
       createdAt: chat.createdAt,
-      updatedAt: chat.updatedAt
+      updatedAt: chat.upda
     }));
 
     return res.status(200).json(formattedChats);

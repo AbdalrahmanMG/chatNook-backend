@@ -101,18 +101,24 @@ const logout = (req, res) => {
   }
 };
 
-const changepic = async (req, res) => {
+const editprofile = async (req, res) => {
   try {
     const loggedUserId = req.user.id;
-    const profilePic = req.body.profilePic;
+    const {profilePic, fullName, email} = req.body;
+    let checkEmail= await User.findOne({email: email})
+    if (checkEmail) {
+      return res.status(400).json({success: false, message: "email is already taken!"})
+    }
 
     const updatedUser = await User.findByIdAndUpdate(
       loggedUserId,
       {
         profilePic,
+        fullName,
+        email
       },
       { new: true }
-    );
+    ).select('-password')
 
     if (!updatedUser) {
       return res.status(400).json({ message: "user is not found" });
@@ -123,4 +129,4 @@ const changepic = async (req, res) => {
   }
 };
 
-module.exports = { login, logout, signup, changepic };
+module.exports = { login, logout, signup, editprofile };
