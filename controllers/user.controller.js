@@ -72,7 +72,7 @@ const login = async (req, res) => {
       return res.status(400).json({ message: "user is not found" });
     }
 
-    generateToken(user.id, res);
+    const token = generateToken(user.id);
     
     return res.status(200).json({
       id:user.id,
@@ -81,6 +81,7 @@ const login = async (req, res) => {
       profilePic:user.profilePic,
       // createdAt:user.createdAt,
       // updatedAt: user.updatedAt
+      token: token
     });
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });

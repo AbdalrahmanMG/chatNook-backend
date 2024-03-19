@@ -3,7 +3,9 @@ const { User } = require('../models/user.model');
 
 const protectedRoutes = async (req, res, next) =>{
     try {
-        const token = req.cookies.jwt;
+        const authHeader = req.headers['authorization']
+        const token = authHeader && authHeader.split(' ')[1];
+        console.log(authHeader);
         if(!token){
         return res.status(401).json({ success: false, message: 'Unauthorized user - no token !' });
         }
