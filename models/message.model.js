@@ -12,6 +12,11 @@ let messageSchema = new mongoose.Schema({
     ref: "User",
     required: true,
   },
+  chatId:{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Chat",
+    required:true
+  },
   message:{
     type: String,
     requried:true

@@ -18,12 +18,12 @@ const sendMessage = async (req, res) => {
         participants: [senderId, recieverId],
       });
     }
-    console.log("chat", chat);
 
     const newMessage = new Massage({
       senderId,
       recieverId,
       message,
+      chatId: chat._id
     });
     console.log("newMessage", newMessage);
 
