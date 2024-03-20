@@ -12,14 +12,18 @@ const getContactsSideBar = async (req, res) => {
       },
     }).select("-password");
 
+    console.log("🎁🎪🎪🎗 before modified");
+
     let modifiedContacts = allContacts.map(c=>({
       id: c._id,
       fullName: c.fullName,
       profilePic: c.profilePic,
     }))
 
+    console.log("🎁🎪🎪🎗 after modified");
     return res.status(200).json(modifiedContacts);
   } catch (error) {
+    console.log(error);
     return res.status(500).json({ success: false, message: error.message });
   }
 };
