@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const yup = require("yup");
 
 let messageSchema = new mongoose.Schema({
   senderId: {
@@ -7,7 +6,7 @@ let messageSchema = new mongoose.Schema({
     ref: "User",
     required: true,
   },
-  recieverId: {
+  recieverId: { //do you really need this ?????????
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     required: true,

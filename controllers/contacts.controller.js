@@ -64,11 +64,12 @@ const getChats = async (req, res) => {
 const createGroupChat = async (req, res)=>{
 try {
   const loggedUserId = req.user.id;
-  const {participants, chatName} = req.body
+  const {participants, chatName, isGroup} = req.body
 
   let chat = await Chat.create({
     participants: [loggedUserId, ...participants],
-    chatName
+    chatName,
+    isGroup
   })
 
   chat = await Chat.findById(chat._id).populate('participants');

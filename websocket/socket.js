@@ -1,39 +1,41 @@
-const {createServer} = require('http')
-const {Server} = require('socket.io')
-const express= require('express')
+const { createServer } = require("http");
+const { Server } = require("socket.io");
+const express = require("express");
 
-const app = express()
-const httpServer = createServer(app)
+const app = express();
+const httpServer = createServer(app);
 
-const io = new Server(httpServer,{
-    cors: {
-        origin: "*",
-        methods: ["GET", "POST"]
-    }
-})
+const io = new Server(httpServer, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"],
+  },
+});
 
-const getRecieverIdSocket = (recieverId)=>{
-    return userSocketMap[recieverId]
+let chats = []
+
+const addChat = (chatId, socketId)=>{
+    !chats.some(chat=> chat.chatId === chatId) && chats.push({chatId, socketId})
 }
 
-const userSocketMap = {}
+const removeChat = (socketId)=>{
+    chats = chats.filter(chat=> chat.socketId === socketId)
+}
 
-io.on("connection", (socket)=>{
-    console.log("user is connected", socket.id);
-    const userId = socket.handshake.query.userId
-    if (userId != "undefined"){
-        return userSocketMap[userId] = socket.id
-    }
+const getChat = (chatId)=>{
+    return chats.find(chat=>chat.chatId === chatId)
+}
 
-    io.emit("getOnlineUsers"), object.keys(userSocketMap)
+io.on("connection", (socket) => {
+  socket.on("addChat", (chatId)=>{
+    addChat(chatId, socket.id)
+    io.emit('getChat', chats)
+  })
 
-    socket.on("disconnect",()=>{
-        console.log("user disconnected", socket.id);
-        delete userSocketMap[userId]
-        io.emit("getOnlineUsers", object.keys(userSocketMap))
-    })
+  socket.on("disconnect", () => {
+    removeChat(socket.id)
+    io.emit('getChats', chats)
+  });
+});
 
-})
-
-
-module.exports = {getRecieverIdSocket, app, io, httpServer}
+module.exports = { app, io, httpServer };

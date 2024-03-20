@@ -1,3 +1,4 @@
+const { boolean } = require("joi");
 const mongoose = require("mongoose");
 
 let chatSchema = new mongoose.Schema(
@@ -23,6 +24,10 @@ let chatSchema = new mongoose.Schema(
         default: [],
       },
     ],
+    isGroup:{
+      type: Boolean,
+      default: false
+    }
   },
   { timestamps: true }
 );

@@ -36,30 +36,32 @@ const sendMessage = async (req, res) => {
     await chat.save();
     await newMessage.save();
 
-    // Socket io
-    // const recieverIdSocket = getRecieverIdSocket(recieverId)
-    // if (recieverIdSocket) {
-    //   io.to(recieverIdSocket).emit("newMessage", newMessage)
-    // }
-
     res.status(200).json(newMessage);
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });
   }
 };
 
+//get messages
 const getMessage = async (req, res) => {
   try {
-    const { chatId } = req.body;
+    const { recieverId, chatId } = req.body;
     const LoggedUser = req.user.id;
 
-    const chat = await Chat.findOne({ _id: chatId }).populate("messages");
-    console.log(chat);
+    let chat = await Chat.findOne({ _id: chatId }).populate("messages");
+
+    if (!chat) {
+      chat = await Chat.findOne({
+        participants: { $all: [LoggedUser, recieverId], $size: 2 },
+        isGroup: false,
+      }).populate("messages");
+    }
 
     if (!chat) {
       return res.status(200).json([]);
     }
 
+    console.log(chat);
     const userInChat = chat.participants.find(
       (participant) => participant == LoggedUser
     );
@@ -91,9 +93,12 @@ const updateMessage = async (req, res) => {
     let createdAt = editedMessage.createdAt;
     let timeDifferance = currentTime - createdAt;
     let timeInMinutes = timeDifferance / (1000 * 60);
-    
+
     if (timeInMinutes > 15) {
-        return res.status(400).json({success: false, message: "you have exceeded the limited time 15min!" });
+      return res.status(400).json({
+        success: false,
+        message: "you have exceeded the limited time 15min!",
+      });
     }
 
     editedMessage.message = message;
@@ -106,9 +111,9 @@ const updateMessage = async (req, res) => {
   }
 };
 
-const deleteMessage = async (req, res)=>{
+const deleteMessage = async (req, res) => {
   try {
-    let { messageId} = req.body;
+    let { messageId } = req.body;
     const LoggedUser = req.user.id;
 
     let messesToDelete = await Massage.findOne({ _id: messageId });
@@ -121,20 +126,27 @@ const deleteMessage = async (req, res)=>{
     let createdAt = messesToDelete.createdAt;
     let timeDifferance = currentTime - createdAt;
     let timeInMinutes = timeDifferance / (1000 * 60);
-    
+
     if (timeInMinutes > 15) {
-        return res.status(400).json({success: false, message: "you have exceeded the limited time 15min!" });
+      return res.status(400).json({
+        success: false,
+        message: "you have exceeded the limited time 15min!",
+      });
     }
 
     await Massage.deleteOne({ _id: messageId });
-    await Chat.updateOne({ _id: messesToDelete.chatId }, { $pull: { messages: messageId } });
+    await Chat.updateOne(
+      { _id: messesToDelete.chatId },
+      { $pull: { messages: messageId } }
+    );
 
-
-    return res.status(201).json({success: true, message: "Message deleted succefully!"});
+    return res
+      .status(201)
+      .json({ success: true, message: "Message deleted succefully!" });
   } catch (error) {
     return res.status(500).json({ success: false, message: error.message });
   }
-}
+};
 module.exports = { sendMessage, getMessage, updateMessage, deleteMessage };
 
 // // show chat messages
