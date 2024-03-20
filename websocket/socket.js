@@ -19,17 +19,31 @@ const addChat = (chatId, socketId)=>{
 }
 
 const removeChat = (socketId)=>{
-    chats = chats.filter(chat=> chat.socketId === socketId)
+    chats = chats.filter(chat=> chat.socketId !== socketId)
 }
 
 const getChat = (chatId)=>{
     return chats.find(chat=>chat.chatId === chatId)
 }
 
+const getChatSocketId = (chatId) => {
+    const chat = getChat(chatId);
+    return chat ? chat.socketId : null;
+};
+
 io.on("connection", (socket) => {
   socket.on("addChat", (chatId)=>{
     addChat(chatId, socket.id)
     io.emit('getChat', chats)
+  })
+
+  socket.on("sendMessage", ({chatId , recieverId, senderId, message})=>{
+    (!chatId)
+    const chat = getChat(chatId)
+    io.to(chat.socketId).emit("getMessage", {
+        senderId,
+        message
+    })
   })
 
   socket.on("disconnect", () => {
@@ -38,4 +52,4 @@ io.on("connection", (socket) => {
   });
 });
 
-module.exports = { app, io, httpServer };
+module.exports = { app, io, httpServer, getChatSocketId };

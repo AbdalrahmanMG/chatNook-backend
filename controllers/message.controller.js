@@ -1,6 +1,7 @@
 const Chat = require("../models/chat.model.js");
 const Massage = require("../models/message.model.js");
 const { User } = require("../models/user.model.js");
+const { getChatSocketId } = require("../websocket/socket.js");
 
 //sending message if there is a chat or creating chat
 const sendMessage = async (req, res) => {
@@ -29,12 +30,21 @@ const sendMessage = async (req, res) => {
       chatId: chat._id,
     });
 
+   
+
     if (newMessage) {
       chat.messages.push(newMessage.id);
     }
 
     await chat.save();
     await newMessage.save();
+
+    // socketIo 
+    // const chatSocketId  = getChatSocketId(chat._id)
+    // if(chatSocketId ){
+    //   io.to(chatSocketId ).emit("newMessage", newMessage)
+
+    // } 
 
     res.status(200).json(newMessage);
   } catch (error) {
