@@ -21,16 +21,16 @@ const sendMessage = async (req, res) => {
       });
     }
 
-    console.log("chat after check", chat);
+    let sender = await User.findById(LoggedUser)
 
     const newMessage = new Massage({
       senderId: LoggedUser,
       recieverId,
       message,
       chatId: chat._id,
+      senderImage:sender.profilePic,
+      senderName:sender.fullName
     });
-
-   
 
     if (newMessage) {
       chat.messages.push(newMessage.id);
@@ -39,12 +39,12 @@ const sendMessage = async (req, res) => {
     await chat.save();
     await newMessage.save();
 
-    // socketIo 
+    // socketIo
     // const chatSocketId  = getChatSocketId(chat._id)
     // if(chatSocketId ){
     //   io.to(chatSocketId ).emit("newMessage", newMessage)
 
-    // } 
+    // }
 
     res.status(200).json(newMessage);
   } catch (error) {
@@ -59,22 +59,20 @@ const getMessage = async (req, res) => {
     const LoggedUser = req.user.id;
 
     let chat = await Chat.findOne({ _id: chatId }).populate("messages");
-    console.log("chat1", chat)
+
     if (!chat) {
       chat = await Chat.findOne({
         participants: { $all: [LoggedUser, recieverId], $size: 2 },
         isGroup: false,
       }).populate("messages");
     }
-    console.log("chat2", chat)
 
     if (!chat) {
       return res.status(200).json([]);
     }
 
-    console.log("chat3", chat)
     const userInChat = chat.participants.find(
-      (participant) => participant == LoggedUser
+      (participant) => participant._id == LoggedUser
     );
 
     if (!userInChat) {
@@ -82,6 +80,21 @@ const getMessage = async (req, res) => {
         .status(403)
         .json({ error: "You are not authorized to access this chat" });
     }
+
+    // chat.messages = await Promise.all(
+    //   chat.messages.map(async (message) => {
+    //     const sender = await User.findById(message.senderId);
+    //     return {
+    //       ...message,
+    //       senderImage: sender.profilePic,
+    //       senderName: sender.fullName,
+    //     };
+    //   })
+    // );
+
+
+    // console.log(Msg);
+    // console.log(chat.messages);
 
     res.status(200).json(chat.messages);
   } catch (error) {

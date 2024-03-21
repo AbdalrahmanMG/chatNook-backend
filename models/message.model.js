@@ -19,7 +19,13 @@ let messageSchema = new mongoose.Schema({
   message:{
     type: String,
     requried:true
-  }
+  },
+  senderImage: {
+    type: String 
+  },
+  senderName: {
+    type: String 
+  },
 }, {timestamps: true});
 
 messageSchema.virtual('id').get(function (){
