@@ -59,19 +59,20 @@ const getMessage = async (req, res) => {
     const LoggedUser = req.user.id;
 
     let chat = await Chat.findOne({ _id: chatId }).populate("messages");
-
+    console.log("chat1", chat)
     if (!chat) {
       chat = await Chat.findOne({
         participants: { $all: [LoggedUser, recieverId], $size: 2 },
         isGroup: false,
       }).populate("messages");
     }
+    console.log("chat2", chat)
 
     if (!chat) {
       return res.status(200).json([]);
     }
 
-    console.log(chat);
+    console.log("chat3", chat)
     const userInChat = chat.participants.find(
       (participant) => participant == LoggedUser
     );

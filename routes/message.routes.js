@@ -3,7 +3,7 @@ let {sendMessage, getMessage, updateMessage, deleteMessage} = require('../contro
 const protectedRoutes = require('../middlewares/protectedRoutes')
 
 router.post('/send',protectedRoutes,sendMessage)
-router.get('/get',protectedRoutes,getMessage)
+router.post('/get',protectedRoutes,getMessage)
 router.patch('/update',protectedRoutes,updateMessage)
 router.delete('/delete',protectedRoutes,deleteMessage)
 

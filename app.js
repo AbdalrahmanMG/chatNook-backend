@@ -18,9 +18,9 @@ const port = process.env.PORT;
 dotenv.config();
 
 // middleware
-app.use(cors())
 app.use(express.json())
 app.use(cookieParser())
+app.use(cors())
 
 //routes
 app.use("/user", userRoutes);
