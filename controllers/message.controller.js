@@ -1,16 +1,15 @@
 const Chat = require("../models/chat.model.js");
 const Massage = require("../models/message.model.js");
 const { User } = require("../models/user.model.js");
-const { getChatSocketId } = require("../websocket/socket.js");
+// const { io } = require("../websocket/newsocket.js");
 
 //sending message if there is a chat or creating chat
-const sendMessage = async (req, res) => {
+const sendingMessage = async (io, data) => {
   try {
-    const { message, chatId, recieverId } = req.body;
-    const LoggedUser = req.user.id;
+    const { message, chatId, recieverId, userId, socket } = data;
+    const LoggedUser = userId;
 
     let chat = await Chat.findOne({ _id: chatId });
-    console.log("chat before check", chat);
 
     if (!chat) {
       let reciever = await User.findById(recieverId);
@@ -21,15 +20,15 @@ const sendMessage = async (req, res) => {
       });
     }
 
-    let sender = await User.findById(LoggedUser)
+    let sender = await User.findById(LoggedUser);
 
     const newMessage = new Massage({
       senderId: LoggedUser,
       recieverId,
       message,
       chatId: chat._id,
-      senderImage:sender.profilePic,
-      senderName:sender.fullName
+      senderImage: sender.profilePic,
+      senderName: sender.fullName,
     });
 
     if (newMessage) {
@@ -39,16 +38,15 @@ const sendMessage = async (req, res) => {
     await chat.save();
     await newMessage.save();
 
-    // socketIo
-    // const chatSocketId  = getChatSocketId(chat._id)
-    // if(chatSocketId ){
-    //   io.to(chatSocketId ).emit("newMessage", newMessage)
+    socket.join(chatId ? chatId : chat._id);
+    console.log("🎈", chatId);
+    io.to(chatId).emit("sendMessage", newMessage);
 
-    // }
-
-    res.status(200).json(newMessage);
+    return newMessage;
+    // res.status(200).json(newMessage);
   } catch (error) {
-    return res.status(500).json({ success: false, message: error.message });
+    console.log(error);
+    // return res.status(500).json({ success: false, message: error.message });
   }
 };
 
@@ -80,21 +78,6 @@ const getMessage = async (req, res) => {
         .status(403)
         .json({ error: "You are not authorized to access this chat" });
     }
-
-    // chat.messages = await Promise.all(
-    //   chat.messages.map(async (message) => {
-    //     const sender = await User.findById(message.senderId);
-    //     return {
-    //       ...message,
-    //       senderImage: sender.profilePic,
-    //       senderName: sender.fullName,
-    //     };
-    //   })
-    // );
-
-
-    // console.log(Msg);
-    // console.log(chat.messages);
 
     res.status(200).json(chat.messages);
   } catch (error) {
@@ -171,7 +154,7 @@ const deleteMessage = async (req, res) => {
     return res.status(500).json({ success: false, message: error.message });
   }
 };
-module.exports = { sendMessage, getMessage, updateMessage, deleteMessage };
+module.exports = { sendingMessage, getMessage, updateMessage, deleteMessage };
 
 // // show chat messages
 // const getMessage = async (req, res) => {
@@ -238,3 +221,13 @@ module.exports = { sendMessage, getMessage, updateMessage, deleteMessage };
 //     return res.status(500).json({ success: false, message: error.message });
 //   }
 // };
+// chat.messages = await Promise.all(
+//   chat.messages.map(async (message) => {
+//     const sender = await User.findById(message.senderId);
+//     return {
+//       ...message,
+//       senderImage: sender.profilePic,
+//       senderName: sender.fullName,
+//     };
+//   })
+// );

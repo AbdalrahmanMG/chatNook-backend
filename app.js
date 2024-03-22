@@ -20,7 +20,8 @@ dotenv.config();
 // middleware
 app.use(express.json())
 app.use(cookieParser())
-app.use(cors())
+app.use(cors()) 
+
 
 //routes
 app.use("/user", userRoutes);
